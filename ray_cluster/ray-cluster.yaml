@@ -1,0 +1,46 @@
+cluster_name: ray-cluster
+
+provider:
+  type: aws
+  region: us-west-2
+  subnet_ids: ["subnet-0dfe07e024d03279c"]
+
+auth:
+  ssh_user: ubuntu
+
+head_node_type: ray.head.default
+
+# head_start_ray_commands:
+#   - ray stop
+#   - PUBLIC_IP=$(curl -s https://api64.ipify.org)
+#   - echo $PUBLIC_IP
+#   - RAY_GRAFANA_IFRAME_HOST=http://${PUBLIC_IP}:3000 ray start --head --port=6379 --dashboard-host=0.0.0.0 --dashboard-port=8265
+
+available_node_types:
+  ray.head.default:
+    node_config:
+      InstanceType: t3.xlarge
+      ImageId: ami-000dad0a345008df0
+      KeyName:
+      SecurityGroupIds: ["sg-0f20720533bcdf878"]
+      SubnetId: subnet-0dfe07e024d03279c
+    resources: {"CPU": 4}
+
+  ray_worker.default:
+    min_workers: 2
+    max_workers: 5
+    node_config:
+      InstanceType: g4dn.2xlarge
+      ImageId: ami-000dad0a345008df0
+      KeyName:
+      SecurityGroupIds: ["sg-0f20720533bcdf878"]
+      SubnetId: subnet-0dfe07e024d03279c
+      TagSpecifications:
+        - ResourceType: instance
+          Tags:
+            - Key: Name
+              Value: ray-worker
+
+    resources: {"CPU": 8, "GPU": 1}
+
+    
